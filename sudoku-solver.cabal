@@ -3,20 +3,18 @@
 
 name:                sudoku-solver
 version:             0.1.0.0
--- synopsis:            
+synopsis:            Sudoku solver
 -- description:         
--- license:             
+license:             GPL-3
 license-file:        LICENSE
 author:              Jarno Le Conté
 maintainer:          jarno.leconte@me.com
 -- copyright:           
--- category:            
+category:            Game
 build-type:          Simple
 cabal-version:       >=1.8
 
 executable sudoku-solver
   main-is:             Main.hs
   -- other-modules:       
-  build-depends:       base ==4.6.*,
-                       containers >= 0.3.0.0,
-                       pretty == 1.1.1.0
+  build-depends:       base ==4.6.*, pretty ==1.1.*, containers ==0.5.*
