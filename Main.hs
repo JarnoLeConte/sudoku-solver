@@ -80,7 +80,7 @@ create = M.fromList . zip [(i,j)|i<-[1..9],j<-[1..9]] . map f
 
 solve :: Board -> Board
 solve b | elim b == b = b              -- complete or fix point
-          | otherwise = solve (elim b) -- recursive solving
+        | otherwise = solve (elim b) -- recursive solving
 
 elim :: Board -> Board 
 elim b = foldr elim' b $ groups [(Horz,[1..9]),(Vert,[1..9]),(Cross,[1,2]),(Box,[1..9])]
@@ -180,11 +180,16 @@ interactive k@(i,j) b = do
   let exec c | c `elem` ['w','s','a','d'] = navigate c k b
              | c `elem` ['1'..'9']        = fillIn c k b
              | c == 'x' || ord c `elem` [126,127] = fillIn 'x' k b
-             | c == 'z'                   = interactive k (solve b)
+             | c == 'z'                   = interactive k (solve (recreate b))
              | c == 'n'                   = interactive k emptyBoard
              | c == 'e'                   = interactive k (if b == board1 then board2 else board1)
              | otherwise                  = interactive k b
   exec c
+
+recreate :: Board -> Board
+recreate = M.map val 
+  where val [x] = [x]
+        val _   = [1..9]
 
 navigate :: Char -> (Int,Int) -> Board -> IO ()
 navigate c (i,j) b = case c of
