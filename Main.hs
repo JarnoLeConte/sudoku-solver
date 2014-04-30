@@ -30,7 +30,7 @@ data Group = Vert | Horz | Cross | Box
 main :: IO ()
 main = do 
   hSetBuffering stdin NoBuffering
-  hSetBuffering stdout NoBuffering
+  hSetBuffering stdout (BlockBuffering Nothing)
   hSetEcho stdin False
   interactive (7,2) emptyBoard
 
@@ -175,15 +175,16 @@ interactive k@(i,j) b = do
   printBoard k b
   putStrLn "Commands: [z: solve] [n: new board] [e: example board]"
   putStrLn "          [w: up] [s: down] [a: left] [d: right] [1-9] [x: delete]"
+  hFlush stdout
   c <- getHiddenChar
   putStrLn $ show $ ord c
-  let exec c | c `elem` ['w','s','a','d'] = navigate c k b
-             | c `elem` ['1'..'9']        = fillIn c k b
+  let exec c | c `elem` ['w','s','a','d'] || ord c `elem` [65,66,67,68] = navigate c k b
+             | c `elem` ['1'..'9'] = fillIn c k b
              | c == 'x' || ord c `elem` [126,127] = fillIn 'x' k b
-             | c == 'z'                   = interactive k (solve (recreate b))
-             | c == 'n'                   = interactive k emptyBoard
-             | c == 'e'                   = interactive k (if b == board1 then board2 else board1)
-             | otherwise                  = interactive k b
+             | c == 'z' = interactive k (solve (recreate b))
+             | c == 'n' = interactive k emptyBoard
+             | c == 'e' = interactive k (if b == board1 then board2 else board1)
+             | otherwise = interactive k b
   exec c
 
 recreate :: Board -> Board
@@ -197,6 +198,11 @@ navigate c (i,j) b = case c of
     's' -> next (i+1,j) --down
     'd' -> next (i,j+1) --right
     'a' -> next (i,j-1) --left
+    _   -> case ord c of
+      65 -> next (i-1,j) --up
+      66 -> next (i+1,j) --down
+      67 -> next (i,j+1) --right
+      68 -> next (i,j-1) --left
   where next (k,l) | 1<=k&&k<=9 && 1<=l&&l<=9 = interactive (k,l) b
                    | otherwise = interactive (i,j) b
 
